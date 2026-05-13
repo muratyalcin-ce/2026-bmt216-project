@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>jQuery Kare Yakalama Oyunu</title>
+
+  <!--
+    1. jQuery 3.3.1 — Google APIs CDN üzerinden yükleniyor.
+       CDN (Content Delivery Network) kullanmanın avantajları:
+         - Tarayıcı bu dosyayı daha önce başka bir siteden önbelleğe almış olabilir.
+         - Google'ın küresel sunucuları sayesinde hızlı yükleme sağlanır.
+         - Kendi sunucunuza yük binmez.
+  -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <!--
+    3. Kendi CSS dosyamız — farklı kod yapılarını ayrı dosyalarda tutuyoruz.
+       style.css içinde tüm görsel tasarım tanımları yer alır.
+  -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── BAŞLANGIÇ / SPLASH EKRANI ── -->
+  <div id="splash">
+    <h1>⬛ KARE<br>YAKALAMA<br>OYUNU ⬛</h1>
+    <p>Gizli bir konum belirlenir. Kareye tıklayarak onu o konuma getirmeye çalış. Kaç denemede bulacaksın?</p>
+    <p>OYUN İLK AÇILDIĞINDA RASTGELE BİR HEDEF KONUM BELİRLENİR.</p>
+    <p>BU KONUM SAKLIDIR.</p>
+    <p>OYUNCU BU RASTGELE DEĞERİ KAÇ DENEMEDE BULURSA OYUN SONUNDA BİLDİRİM ALIR.</p>
+    <button id="splash-start-btn" class="press-start">▶ BAŞLAMAK İÇİN TIKLA</button>
+  </div>
+
+  <!-- ── ÜST HUD (Heads-Up Display) PANELİ ── -->
+  <div id="hud">
+    <span class="hud-title">⬛ KARE YAKALAMA</span>
+
+    <div class="hud-stats">
+      <div class="stat-block">
+        <span class="stat-label">DENEME</span>
+        <span class="stat-value" id="attempt-count">0</span>
+      </div>
+      <div class="stat-block">
+        <span class="stat-label">HEDEF KONUM</span>
+        <span class="stat-value" id="target-pos">—</span>
+      </div>
+    </div>
+
+    <!-- Verilen HTML'deki <button> — oyunu başlatır -->
+    <button id="start-btn">▶ OYUNU BAŞLAT</button>
+  </div>
+
+  <!-- ── OYUN ALANI ── -->
+  <div id="game-area">
+    <!--
+      Verilen HTML'deki orijinal <div> — position:absolute ile serbestçe hareket eder.
+      jQuery .animate() bu elementin left/top/opacity/width/height değerlerini değiştirir.
+    -->
+    <div id="target-box" style="background:#98bf21; height:80px; width:80px; position:absolute; left:100px; top:120px;"></div>
+  </div>
+
+  <!-- ── ALT BİLGİ ÇUBUĞU ── -->
+  <div id="info-bar">
+    <span>jquery.min.js = Sıkıştırılmış jQuery kütüphanesi</span>
+    <span>|</span>
+    <span>.animate(<span>{özellik}</span>, <span>süre</span>) ile CSS değerleri kademeli değişir</span>
+    <span>|</span>
+    <span>Kaynak: <span>googleapis CDN</span></span>
+  </div>
+
+  <!-- ── ANİMASYON DEMO ALANI (Orijinal HTML'deki button ve div mantığı) ──
+       Bu bölüm verilen HTML'deki orijinal animate() zincirini gösterir.
+       Ayrı bir demo kutusu üzerinde çalışır.
+  -->
+  <!--
+  <div style="position:fixed; bottom:60px; right:20px; z-index:20;">
+    <button id="anim-demo-btn" style="...">Animasyonu Başlat</button>
+    <div id="demo-div" style="background:#98bf21;height:60px;width:60px;position:absolute;"></div>
+  </div>
+  -->
+
+  <!-- ── SONUÇ OVERLAY MODALI ── -->
+  <div id="overlay">
+    <div id="result-card">
+      <div id="result-title">🎮 OYUN BİTTİ 🎮</div>
+      <div id="result-message">Gizli hedef konumu buldun!</div>
+      <div id="result-score">— DENEME</div>
+      <div id="result-rating">—</div>
+      <button id="restart-btn">↺ YENİDEN OYNA</button>
+    </div>
+  </div>
+
+  <!--
+    2. Kendi script dosyamız — style.css gibi ayrı tutuldu.
+       script.js içinde tüm jQuery oyun mantığı yer alır.
+       jQuery'den SONRA yüklenmeli (bağımlılık sırası).
+  -->
+  <script src="script.js"></script>
+</body>
+</html>
