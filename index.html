@@ -1,101 +1,1014 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>jQuery Kare Yakalama Oyunu</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giriş Paneli — BMT216</title>
 
-  <!--
-    1. jQuery 3.3.1 — Google APIs CDN üzerinden yükleniyor.
-       CDN (Content Delivery Network) kullanmanın avantajları:
-         - Tarayıcı bu dosyayı daha önce başka bir siteden önbelleğe almış olabilir.
-         - Google'ın küresel sunucuları sayesinde hızlı yükleme sağlanır.
-         - Kendi sunucunuza yük binmez.
-  -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!-- Bootstrap 5.3.3 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <!-- Font Awesome 6.5 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!--
-    3. Kendi CSS dosyamız — farklı kod yapılarını ayrı dosyalarda tutuyoruz.
-       style.css içinde tüm görsel tasarım tanımları yer alır.
-  -->
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ─── CSS Variables ─────────────────────────────────── */
+    :root {
+      --bg-primary:   #0f0c1d;
+      --bg-secondary: #1a1530;
+      --bg-card:      rgba(255, 255, 255, 0.06);
+      --bg-card-hover:rgba(255, 255, 255, 0.09);
+      --accent:       #7c3aed;
+      --accent-end:   #a78bfa;
+      --accent-rgb:   124, 58, 237;
+      --text-primary: #f1f0f5;
+      --text-muted:   #9491a7;
+      --text-label:   #c4c1d4;
+      --border-color: rgba(255, 255, 255, 0.10);
+      --border-focus: rgba(124, 58, 237, 0.70);
+      --field-bg:     rgba(255, 255, 255, 0.06);
+      --valid-color:  #22c55e;
+      --invalid-color:#ef4444;
+      --tab-active-bg:rgba(124, 58, 237, 0.18);
+      --social-bg:    rgba(255, 255, 255, 0.05);
+      --divider:      rgba(255, 255, 255, 0.12);
+      --shape1:       rgba(124, 58, 237, 0.25);
+      --shape2:       rgba(167, 139, 250, 0.18);
+      --shadow:       0 25px 60px rgba(0, 0, 0, 0.55);
+      --toast-bg:     #1e1b2e;
+      --checkbox-bg:  rgba(255,255,255,0.08);
+    }
+
+    body.light-theme {
+      --bg-primary:    #f0eeff;
+      --bg-secondary:  #e4deff;
+      --bg-card:       rgba(255, 255, 255, 0.75);
+      --bg-card-hover: rgba(255, 255, 255, 0.90);
+      --text-primary:  #1a1530;
+      --text-muted:    #6b6880;
+      --text-label:    #3d3a52;
+      --border-color:  rgba(100, 80, 200, 0.18);
+      --border-focus:  rgba(124, 58, 237, 0.55);
+      --field-bg:      rgba(255, 255, 255, 0.65);
+      --tab-active-bg: rgba(124, 58, 237, 0.10);
+      --social-bg:     rgba(255, 255, 255, 0.70);
+      --divider:       rgba(100, 80, 200, 0.18);
+      --shape1:        rgba(124, 58, 237, 0.12);
+      --shape2:        rgba(167, 139, 250, 0.10);
+      --shadow:        0 20px 50px rgba(80, 50, 180, 0.15);
+      --toast-bg:      #ffffff;
+      --checkbox-bg:   rgba(100, 80, 200, 0.08);
+    }
+
+    /* ─── Base ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-primary);
+      background-image:
+        radial-gradient(ellipse 80% 60% at 20% 0%, var(--shape1) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 100%, var(--shape2) 0%, transparent 55%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      transition: background 0.35s, color 0.35s;
+      overflow-x: hidden;
+    }
+
+    /* ─── Background Shapes ─────────────────────────────── */
+    .bg-shapes {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .bg-shapes span {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      animation: float 8s ease-in-out infinite alternate;
+    }
+    .bg-shapes span:nth-child(1) {
+      width: 380px; height: 380px;
+      background: rgba(124, 58, 237, 0.18);
+      top: -100px; left: -80px;
+      animation-duration: 9s;
+    }
+    .bg-shapes span:nth-child(2) {
+      width: 300px; height: 300px;
+      background: rgba(167, 139, 250, 0.14);
+      bottom: -80px; right: -60px;
+      animation-duration: 11s; animation-delay: -3s;
+    }
+    .bg-shapes span:nth-child(3) {
+      width: 200px; height: 200px;
+      background: rgba(99, 102, 241, 0.12);
+      top: 40%; left: 60%;
+      animation-duration: 13s; animation-delay: -5s;
+    }
+    @keyframes float {
+      from { transform: translateY(0) scale(1); }
+      to   { transform: translateY(30px) scale(1.05); }
+    }
+
+    /* ─── Theme Toggle ──────────────────────────────────── */
+    #themeToggle {
+      position: fixed; top: 18px; right: 18px; z-index: 1000;
+      width: 44px; height: 44px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s;
+    }
+    #themeToggle:hover {
+      background: var(--tab-active-bg);
+      border-color: var(--border-focus);
+      transform: scale(1.08);
+    }
+
+    /* ─── Auth Wrapper ──────────────────────────────────── */
+    .auth-wrapper {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 40px 16px;
+    }
+
+    /* ─── Auth Card ─────────────────────────────────────── */
+    .auth-card {
+      width: 100%; max-width: 440px;
+      background: var(--bg-card);
+      backdrop-filter: blur(24px) saturate(1.4);
+      -webkit-backdrop-filter: blur(24px) saturate(1.4);
+      border: 1px solid var(--border-color);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: background 0.35s, border-color 0.35s, box-shadow 0.35s;
+    }
+
+    /* ─── Auth Header ───────────────────────────────────── */
+    .auth-header {
+      padding: 32px 36px 0;
+      text-align: center;
+    }
+    .auth-logo {
+      width: 58px; height: 58px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-end));
+      border-radius: 16px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; color: #fff;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.4);
+    }
+    .auth-title {
+      font-size: 1.45rem; font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .auth-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0;
+    }
+
+    /* ─── Tabs ──────────────────────────────────────────── */
+    .auth-tabs {
+      display: flex;
+      padding: 20px 36px 0;
+      gap: 4px;
+      border-bottom: 1px solid var(--border-color);
+      list-style: none;
+    }
+    .auth-tabs li { flex: 1; }
+    .auth-tabs .tab-btn {
+      width: 100%;
+      background: none; border: none;
+      color: var(--text-muted);
+      font-size: 0.82rem; font-weight: 500;
+      padding: 9px 6px 11px;
+      border-radius: 8px 8px 0 0;
+      cursor: pointer;
+      transition: all 0.22s;
+      position: relative;
+      white-space: nowrap;
+    }
+    .auth-tabs .tab-btn::after {
+      content: '';
+      position: absolute; bottom: -1px; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-end));
+      border-radius: 2px;
+      opacity: 0;
+      transition: opacity 0.22s;
+    }
+    .auth-tabs .tab-btn.active {
+      color: var(--accent-end);
+      background: var(--tab-active-bg);
+    }
+    .auth-tabs .tab-btn.active::after { opacity: 1; }
+    .auth-tabs .tab-btn:hover:not(.active) {
+      color: var(--text-primary);
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* ─── Tab Content ───────────────────────────────────── */
+    .auth-body { padding: 28px 36px 32px; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    /* ─── Social Buttons ────────────────────────────────── */
+    .social-row {
+      display: flex; gap: 10px;
+      margin-bottom: 18px;
+    }
+    .social-btn {
+      flex: 1;
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: var(--social-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 0.82rem; font-weight: 500;
+      cursor: pointer;
+      transition: all 0.22s;
+      text-decoration: none;
+    }
+    .social-btn:hover {
+      background: var(--tab-active-bg);
+      border-color: var(--border-focus);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+    }
+    .social-btn .fab { font-size: 1rem; }
+    .social-btn .fab.fa-google { color: #ea4335; }
+    .social-btn .fab.fa-github { color: var(--text-primary); }
+
+    /* ─── Divider ───────────────────────────────────────── */
+    .auth-divider {
+      display: flex; align-items: center;
+      gap: 10px;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-bottom: 18px;
+    }
+    .auth-divider::before, .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--divider);
+    }
+
+    /* ─── Field Group ───────────────────────────────────── */
+    .field-group { margin-bottom: 14px; }
+    .field-label {
+      display: block;
+      font-size: 0.8rem; font-weight: 600;
+      color: var(--text-label);
+      margin-bottom: 6px;
+      letter-spacing: 0.02em;
+    }
+
+    /* ─── Field Wrap (critical structure) ──────────────── */
+    .field-wrap {
+      display: flex;
+      align-items: center;
+      background: var(--field-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      transition: border-color 0.22s, box-shadow 0.22s, background 0.22s;
+      position: relative;
+      overflow: hidden;
+    }
+    .field-wrap:focus-within {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.18);
+      background: var(--bg-card-hover);
+    }
+    .field-wrap.is-invalid {
+      border-color: var(--invalid-color) !important;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+    }
+    .field-wrap.is-valid {
+      border-color: var(--valid-color) !important;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.10) !important;
+    }
+
+    /* ─── Field Icon ────────────────────────────────────── */
+    .field-icon {
+      flex-shrink: 0;
+      width: 40px;
+      text-align: center;
+      pointer-events: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* ─── Field Control ─────────────────────────────────── */
+    .field-control {
+      flex: 1;
+      border: none !important;
+      outline: none !important;
+      background: transparent !important;
+      color: var(--text-primary) !important;
+      font-size: 0.875rem;
+      padding: 12px 8px;
+      min-width: 0;
+      box-shadow: none !important;
+    }
+    .field-control::placeholder { color: var(--text-muted); }
+    .field-control:-webkit-autofill,
+    .field-control:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0 100px transparent inset !important;
+      -webkit-text-fill-color: var(--text-primary) !important;
+      transition: background-color 9999s ease-in-out 0s;
+    }
+
+    /* ─── Toggle Password ───────────────────────────────── */
+    .toggle-pw {
+      flex-shrink: 0;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      padding: 0 12px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      line-height: 1;
+      height: 100%;
+      display: flex; align-items: center;
+      transition: color 0.2s;
+    }
+    .toggle-pw:hover { color: var(--accent-end); }
+
+    /* ─── Field Message ─────────────────────────────────── */
+    .field-msg {
+      font-size: 0.75rem;
+      margin-top: 5px;
+      min-height: 16px;
+      padding-left: 4px;
+      transition: all 0.2s;
+    }
+    .field-msg.error  { color: var(--invalid-color); }
+    .field-msg.ok     { color: var(--valid-color); }
+
+    /* ─── Remember / Forgot Row ─────────────────────────── */
+    .remember-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .remember-label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.8rem; color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+    }
+    .remember-check {
+      width: 16px; height: 16px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      background: var(--checkbox-bg);
+    }
+    .forgot-link {
+      font-size: 0.8rem;
+      color: var(--accent-end);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .forgot-link:hover { color: var(--accent); text-decoration: underline; }
+
+    /* ─── Auth Button ───────────────────────────────────── */
+    .btn-auth {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem; font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-end) 100%);
+      color: #fff;
+      letter-spacing: 0.02em;
+      position: relative; overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+      box-shadow: 0 6px 20px rgba(var(--accent-rgb), 0.38);
+    }
+    .btn-auth::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #fff 0%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .btn-auth:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(var(--accent-rgb), 0.48);
+      filter: brightness(1.08);
+    }
+    .btn-auth:hover::before { opacity: 0.08; }
+    .btn-auth:active { transform: translateY(0); }
+
+    /* ─── Switch Link ───────────────────────────────────── */
+    .switch-row {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    .switch-row a {
+      color: var(--accent-end);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    .switch-row a:hover { color: var(--accent); text-decoration: underline; }
+
+    /* ─── Strength Bar ──────────────────────────────────── */
+    .strength-wrap { margin-top: 8px; margin-bottom: 2px; }
+    .strength-bar {
+      height: 5px;
+      background: var(--border-color);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .strength-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 99px;
+      transition: width 0.35s ease, background 0.35s ease;
+    }
+    .strength-label {
+      font-size: 0.72rem;
+      margin-top: 4px;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    /* ─── Forgot Panel ──────────────────────────────────── */
+    .forgot-info {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      padding: 12px 14px;
+      background: var(--tab-active-bg);
+      border-radius: 10px;
+      border-left: 3px solid var(--accent);
+    }
+
+    /* ─── Toast ─────────────────────────────────────────── */
+    .toast-container-custom {
+      position: fixed; top: 70px; right: 18px;
+      z-index: 9999;
+    }
+    #liveToast {
+      background: var(--toast-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-primary);
+      min-width: 260px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      backdrop-filter: blur(16px);
+    }
+    #liveToast .toast-body {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+    }
+    #liveToast .toast-close {
+      background: none; border: none;
+      color: var(--text-muted); cursor: pointer;
+      margin-left: auto; font-size: 1rem;
+      line-height: 1; padding: 0;
+    }
+
+    /* ─── Responsive ────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .auth-header  { padding: 24px 22px 0; }
+      .auth-body    { padding: 22px 22px 26px; }
+      .auth-tabs    { padding: 16px 22px 0; }
+      .auth-tabs .tab-btn { font-size: 0.75rem; padding: 8px 4px 10px; }
+      .social-row   { flex-direction: column; }
+      .auth-card    { border-radius: 18px; }
+    }
+
+    /* ─── Animations ────────────────────────────────────── */
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .tab-pane.active { animation: fadeSlideIn 0.28s ease both; }
+  </style>
 </head>
-<body>
 
-  <!-- ── BAŞLANGIÇ / SPLASH EKRANI ── -->
-  <div id="splash">
-    <h1>⬛ KARE<br>YAKALAMA<br>OYUNU ⬛</h1>
-    <p>Gizli bir konum belirlenir. Kareye tıklayarak onu o konuma getirmeye çalış. Kaç denemede bulacaksın?</p>
-    <p>OYUN İLK AÇILDIĞINDA RASTGELE BİR HEDEF KONUM BELİRLENİR.</p>
-    <p>BU KONUM SAKLIDIR.</p>
-    <p>OYUNCU BU RASTGELE DEĞERİ KAÇ DENEMEDE BULURSA OYUN SONUNDA BİLDİRİM ALIR.</p>
-    <button id="splash-start-btn" class="press-start">▶ BAŞLAMAK İÇİN TIKLA</button>
+<body class="dark-theme">
+
+  <!-- Background shapes -->
+  <div class="bg-shapes">
+    <span></span><span></span><span></span>
   </div>
 
-  <!-- ── ÜST HUD (Heads-Up Display) PANELİ ── -->
-  <div id="hud">
-    <span class="hud-title">⬛ KARE YAKALAMA</span>
+  <!-- Theme toggle -->
+  <button id="themeToggle" title="Tema Değiştir">
+    <i class="fas fa-sun"></i>
+  </button>
 
-    <div class="hud-stats">
-      <div class="stat-block">
-        <span class="stat-label">DENEME</span>
-        <span class="stat-value" id="attempt-count">0</span>
+  <!-- Main wrapper -->
+  <div class="auth-wrapper">
+    <div class="auth-card">
+
+      <!-- Header -->
+      <div class="auth-header">
+        <div class="auth-logo">
+          <i class="fas fa-shield-halved"></i>
+        </div>
+        <h1 class="auth-title">Hoş Geldiniz</h1>
+        <p class="auth-subtitle">Hesabınıza güvenle erişin</p>
       </div>
-      <div class="stat-block">
-        <span class="stat-label">HEDEF KONUM</span>
-        <span class="stat-value" id="target-pos">—</span>
+
+      <!-- Tabs -->
+      <ul class="auth-tabs" id="authTabs">
+        <li><button class="tab-btn active" data-tab="login">
+          <i class="fas fa-right-to-bracket me-1"></i>Giriş Yap
+        </button></li>
+        <li><button class="tab-btn" data-tab="register">
+          <i class="fas fa-user-plus me-1"></i>Kayıt Ol
+        </button></li>
+        <li><button class="tab-btn" data-tab="forgot">
+          <i class="fas fa-key me-1"></i>Şifremi Unuttum
+        </button></li>
+      </ul>
+
+      <!-- Tab content -->
+      <div class="auth-body">
+
+        <!-- ═══ LOGIN TAB ═══ -->
+        <div class="tab-pane active" id="tab-login">
+
+          <!-- Social buttons -->
+          <div class="social-row">
+            <a href="#" class="social-btn" onclick="return false;">
+              <i class="fab fa-google"></i> Google ile Giriş
+            </a>
+            <a href="#" class="social-btn" onclick="return false;">
+              <i class="fab fa-github"></i> GitHub ile Giriş
+            </a>
+          </div>
+          <div class="auth-divider">ya da e-posta ile</div>
+
+          <form id="loginForm" novalidate autocomplete="off">
+
+            <!-- Email -->
+            <div class="field-group">
+              <label class="field-label" for="login-email">E-posta Adresi</label>
+              <div class="field-wrap" id="wrap-login-email">
+                <span class="field-icon"><i class="fas fa-envelope"></i></span>
+                <input
+                  type="email"
+                  id="login-email"
+                  name="login-email"
+                  class="field-control"
+                  placeholder="ornek@eposta.com"
+                  autocomplete="email"
+                >
+              </div>
+              <div class="field-msg" id="msg-login-email"></div>
+            </div>
+
+            <!-- Password -->
+            <div class="field-group">
+              <label class="field-label" for="login-password">Şifre</label>
+              <div class="field-wrap" id="wrap-login-password">
+                <span class="field-icon"><i class="fas fa-lock"></i></span>
+                <input
+                  type="password"
+                  id="login-password"
+                  name="login-password"
+                  class="field-control"
+                  placeholder="••••••••"
+                  autocomplete="current-password"
+                >
+                <button type="button" class="toggle-pw" data-target="login-password" title="Şifreyi Göster/Gizle">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+              <div class="field-msg" id="msg-login-password"></div>
+            </div>
+
+            <!-- Remember + Forgot -->
+            <div class="remember-row">
+              <label class="remember-label">
+                <input type="checkbox" class="remember-check" id="rememberMe">
+                Beni hatırla
+              </label>
+              <a href="#" class="forgot-link" data-tab="forgot">Şifremi Unuttum?</a>
+            </div>
+
+            <button type="submit" class="btn-auth">
+              <i class="fas fa-right-to-bracket me-2"></i>Giriş Yap
+            </button>
+          </form>
+
+          <div class="switch-row">
+            Hesabın yok mu? <a href="#" data-tab="register">Kayıt Ol</a>
+          </div>
+        </div>
+        <!-- ═══ END LOGIN ═══ -->
+
+
+        <!-- ═══ REGISTER TAB ═══ -->
+        <div class="tab-pane" id="tab-register">
+          <form id="registerForm" novalidate autocomplete="off">
+
+            <!-- Full name -->
+            <div class="field-group">
+              <label class="field-label" for="reg-name">Ad Soyad</label>
+              <div class="field-wrap" id="wrap-reg-name">
+                <span class="field-icon"><i class="fas fa-user"></i></span>
+                <input
+                  type="text"
+                  id="reg-name"
+                  name="reg-name"
+                  class="field-control"
+                  placeholder="Adınız Soyadınız"
+                  autocomplete="name"
+                >
+              </div>
+              <div class="field-msg" id="msg-reg-name"></div>
+            </div>
+
+            <!-- Email -->
+            <div class="field-group">
+              <label class="field-label" for="reg-email">E-posta Adresi</label>
+              <div class="field-wrap" id="wrap-reg-email">
+                <span class="field-icon"><i class="fas fa-envelope"></i></span>
+                <input
+                  type="email"
+                  id="reg-email"
+                  name="reg-email"
+                  class="field-control"
+                  placeholder="ornek@eposta.com"
+                  autocomplete="email"
+                >
+              </div>
+              <div class="field-msg" id="msg-reg-email"></div>
+            </div>
+
+            <!-- Password -->
+            <div class="field-group">
+              <label class="field-label" for="reg-password">Şifre</label>
+              <div class="field-wrap" id="wrap-reg-password">
+                <span class="field-icon"><i class="fas fa-lock"></i></span>
+                <input
+                  type="password"
+                  id="reg-password"
+                  name="reg-password"
+                  class="field-control"
+                  placeholder="En az 8 karakter"
+                  autocomplete="new-password"
+                >
+                <button type="button" class="toggle-pw" data-target="reg-password" title="Şifreyi Göster/Gizle">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+              <div class="field-msg" id="msg-reg-password"></div>
+              <!-- Strength -->
+              <div class="strength-wrap" id="strengthWrap" style="display:none;">
+                <div class="strength-bar">
+                  <div class="strength-fill" id="strengthFill"></div>
+                </div>
+                <div class="strength-label" id="strengthLabel"></div>
+              </div>
+            </div>
+
+            <!-- Confirm password -->
+            <div class="field-group">
+              <label class="field-label" for="reg-confirm">Şifre Tekrar</label>
+              <div class="field-wrap" id="wrap-reg-confirm">
+                <span class="field-icon"><i class="fas fa-lock-open"></i></span>
+                <input
+                  type="password"
+                  id="reg-confirm"
+                  name="reg-confirm"
+                  class="field-control"
+                  placeholder="Şifreyi tekrar girin"
+                  autocomplete="new-password"
+                >
+                <button type="button" class="toggle-pw" data-target="reg-confirm" title="Şifreyi Göster/Gizle">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+              <div class="field-msg" id="msg-reg-confirm"></div>
+            </div>
+
+            <button type="submit" class="btn-auth">
+              <i class="fas fa-user-plus me-2"></i>Hesap Oluştur
+            </button>
+          </form>
+
+          <div class="switch-row">
+            Zaten hesabın var mı? <a href="#" data-tab="login">Giriş Yap</a>
+          </div>
+        </div>
+        <!-- ═══ END REGISTER ═══ -->
+
+
+        <!-- ═══ FORGOT TAB ═══ -->
+        <div class="tab-pane" id="tab-forgot">
+
+          <div class="forgot-info">
+            <i class="fas fa-circle-info me-2" style="color:var(--accent-end);"></i>
+            Kayıtlı e-posta adresinizi girin. Şifre sıfırlama bağlantısı göndereceğiz.
+          </div>
+
+          <form id="forgotForm" novalidate autocomplete="off">
+
+            <!-- Email -->
+            <div class="field-group">
+              <label class="field-label" for="forgot-email">E-posta Adresi</label>
+              <div class="field-wrap" id="wrap-forgot-email">
+                <span class="field-icon"><i class="fas fa-envelope"></i></span>
+                <input
+                  type="email"
+                  id="forgot-email"
+                  name="forgot-email"
+                  class="field-control"
+                  placeholder="kayitli@eposta.com"
+                  autocomplete="email"
+                >
+              </div>
+              <div class="field-msg" id="msg-forgot-email"></div>
+            </div>
+
+            <button type="submit" class="btn-auth">
+              <i class="fas fa-paper-plane me-2"></i>Sıfırlama Bağlantısı Gönder
+            </button>
+          </form>
+
+          <div class="switch-row">
+            Şifreni hatırladın mı? <a href="#" data-tab="login">Giriş Yap</a>
+          </div>
+        </div>
+        <!-- ═══ END FORGOT ═══ -->
+
+      </div><!-- /.auth-body -->
+    </div><!-- /.auth-card -->
+  </div><!-- /.auth-wrapper -->
+
+
+  <!-- Toast -->
+  <div class="toast-container-custom">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3500">
+      <div class="toast-body">
+        <i id="toastIcon" class="fas fa-check-circle" style="color:#22c55e; font-size:1.1rem;"></i>
+        <span id="toastMsg">İşlem başarılı.</span>
+        <button class="toast-close" data-bs-dismiss="toast" aria-label="Kapat">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
     </div>
-
-    <!-- Verilen HTML'deki <button> — oyunu başlatır -->
-    <button id="start-btn">▶ OYUNU BAŞLAT</button>
   </div>
 
-  <!-- ── OYUN ALANI ── -->
-  <div id="game-area">
-    <!--
-      Verilen HTML'deki orijinal <div> — position:absolute ile serbestçe hareket eder.
-      jQuery .animate() bu elementin left/top/opacity/width/height değerlerini değiştirir.
-    -->
-    <div id="target-box" style="background:#98bf21; height:80px; width:80px; position:absolute; left:100px; top:120px;"></div>
-  </div>
 
-  <!-- ── ALT BİLGİ ÇUBUĞU ── -->
-  <div id="info-bar">
-    <span>jquery.min.js = Sıkıştırılmış jQuery kütüphanesi</span>
-    <span>|</span>
-    <span>.animate(<span>{özellik}</span>, <span>süre</span>) ile CSS değerleri kademeli değişir</span>
-    <span>|</span>
-    <span>Kaynak: <span>googleapis CDN</span></span>
-  </div>
+  <!-- jQuery 3.7.1 -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- Bootstrap 5.3.3 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- ── ANİMASYON DEMO ALANI (Orijinal HTML'deki button ve div mantığı) ──
-       Bu bölüm verilen HTML'deki orijinal animate() zincirini gösterir.
-       Ayrı bir demo kutusu üzerinde çalışır.
-  -->
-  <!--
-  <div style="position:fixed; bottom:60px; right:20px; z-index:20;">
-    <button id="anim-demo-btn" style="...">Animasyonu Başlat</button>
-    <div id="demo-div" style="background:#98bf21;height:60px;width:60px;position:absolute;"></div>
-  </div>
-  -->
+  <script>
+  $(function () {
 
-  <!-- ── SONUÇ OVERLAY MODALI ── -->
-  <div id="overlay">
-    <div id="result-card">
-      <div id="result-title">🎮 OYUN BİTTİ 🎮</div>
-      <div id="result-message">Gizli hedef konumu buldun!</div>
-      <div id="result-score">— DENEME</div>
-      <div id="result-rating">—</div>
-      <button id="restart-btn">↺ YENİDEN OYNA</button>
-    </div>
-  </div>
+    /* ══════════════════════════════════════
+       THEME TOGGLE
+    ══════════════════════════════════════ */
+    const $body = $('body');
+    const $themeBtn = $('#themeToggle');
 
-  <!--
-    2. Kendi script dosyamız — style.css gibi ayrı tutuldu.
-       script.js içinde tüm jQuery oyun mantığı yer alır.
-       jQuery'den SONRA yüklenmeli (bağımlılık sırası).
-  -->
-  <script src="script.js"></script>
+    function applyTheme(theme) {
+      if (theme === 'light') {
+        $body.addClass('light-theme');
+        $themeBtn.find('i').removeClass('fa-sun').addClass('fa-moon');
+      } else {
+        $body.removeClass('light-theme');
+        $themeBtn.find('i').removeClass('fa-moon').addClass('fa-sun');
+      }
+    }
+
+    // Restore saved theme
+    applyTheme(localStorage.getItem('theme') || 'dark');
+
+    $themeBtn.on('click', function () {
+      const isLight = $body.hasClass('light-theme');
+      const next = isLight ? 'dark' : 'light';
+      localStorage.setItem('theme', next);
+      applyTheme(next);
+    });
+
+
+    /* ══════════════════════════════════════
+       TAB SWITCHING
+    ══════════════════════════════════════ */
+    function switchTab(name) {
+      // Update nav buttons
+      $('#authTabs .tab-btn').removeClass('active');
+      $(`#authTabs .tab-btn[data-tab="${name}"]`).addClass('active');
+
+      // Animate out current, animate in new
+      const $current = $('.tab-pane.active');
+      const $next    = $(`#tab-${name}`);
+
+      if ($current.attr('id') === $next.attr('id')) return;
+
+      $current.fadeOut(160, function () {
+        $current.removeClass('active');
+        $next.addClass('active').hide().fadeIn(200);
+      });
+    }
+
+    // Tab button clicks
+    $(document).on('click', '[data-tab]', function (e) {
+      e.preventDefault();
+      switchTab($(this).data('tab'));
+    });
+
+
+    /* ══════════════════════════════════════
+       PASSWORD TOGGLE
+    ══════════════════════════════════════ */
+    $(document).on('click', '.toggle-pw', function () {
+      const targetId = $(this).data('target');
+      const $input   = $('#' + targetId);
+      const isPass   = $input.attr('type') === 'password';
+      $input.attr('type', isPass ? 'text' : 'password');
+      $(this).find('i')
+        .toggleClass('fa-eye', !isPass)
+        .toggleClass('fa-eye-slash', isPass);
+    });
+
+
+    /* ══════════════════════════════════════
+       PASSWORD STRENGTH
+    ══════════════════════════════════════ */
+    const strengthLevels = ['', 'Çok Zayıf', 'Zayıf', 'Orta', 'Güçlü'];
+    const strengthColors = ['', '#ef4444',   '#f97316', '#eab308', '#22c55e'];
+    const strengthPct    = [0,  25,          50,        75,        100];
+
+    $('#reg-password').on('input', function () {
+      const val = $(this).val();
+      const $wrap = $('#strengthWrap');
+
+      if (!val) { $wrap.hide(); return; }
+      $wrap.show();
+
+      let score = 0;
+      if (val.length >= 8)           score++;
+      if (/[A-Z]/.test(val))         score++;
+      if (/[0-9]/.test(val))         score++;
+      if (/[^A-Za-z0-9]/.test(val))  score++;
+      if (score === 0) score = 1; // at least "Çok Zayıf" if anything typed
+
+      $('#strengthFill').css({
+        width:      strengthPct[score] + '%',
+        background: strengthColors[score]
+      });
+      $('#strengthLabel').text(strengthLevels[score]).css('color', strengthColors[score]);
+
+      // Re-validate confirm if already touched
+      const $confirm = $('#reg-confirm');
+      if ($confirm.val()) validateField($confirm);
+    });
+
+
+    /* ══════════════════════════════════════
+       VALIDATION ENGINE
+    ══════════════════════════════════════ */
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+    const fieldRules = {
+      'login-email':    { required: true, email: true },
+      'login-password': { required: true, minLen: 8 },
+      'reg-name':       { required: true, minLen: 2 },
+      'reg-email':      { required: true, email: true },
+      'reg-password':   { required: true, minLen: 8 },
+      'reg-confirm':    { required: true, matchId: 'reg-password' },
+      'forgot-email':   { required: true, email: true }
+    };
+
+    function setFieldState($wrap, $msg, isValid, message) {
+      $wrap
+        .toggleClass('is-invalid', !isValid)
+        .toggleClass('is-valid',    isValid);
+      $msg
+        .text(isValid ? '' : message)
+        .toggleClass('error', !isValid)
+        .toggleClass('ok',     isValid);
+      return isValid;
+    }
+
+    function validateField($input) {
+      const id    = $input.attr('id');
+      const val   = $input.val().trim();
+      const rules = fieldRules[id];
+      if (!rules) return true;
+
+      const $wrap = $('#wrap-' + id);
+      const $msg  = $('#msg-'  + id);
+
+      if (rules.required && !val) {
+        return setFieldState($wrap, $msg, false, 'Bu alan zorunludur.');
+      }
+      if (rules.email && !EMAIL_RE.test(val)) {
+        return setFieldState($wrap, $msg, false, 'Geçerli bir e-posta adresi girin.');
+      }
+      if (rules.minLen && val.length < rules.minLen) {
+        return setFieldState($wrap, $msg, false, `En az ${rules.minLen} karakter girilmelidir.`);
+      }
+      if (rules.matchId) {
+        const refVal = $('#' + rules.matchId).val();
+        if (val !== refVal) {
+          return setFieldState($wrap, $msg, false, 'Şifreler eşleşmiyor.');
+        }
+      }
+      return setFieldState($wrap, $msg, true, '');
+    }
+
+    // Blur validation
+    $(document).on('blur', '.field-control', function () {
+      validateField($(this));
+    });
+
+    // Live confirm re-check
+    $('#reg-confirm').on('input', function () {
+      if ($(this).val()) validateField($(this));
+    });
+
+
+    /* ══════════════════════════════════════
+       TOAST
+    ══════════════════════════════════════ */
+    const toastIcons = {
+      success: { cls: 'fa-circle-check',  color: '#22c55e' },
+      error:   { cls: 'fa-circle-xmark',  color: '#ef4444' },
+      info:    { cls: 'fa-circle-info',   color: '#60a5fa' }
+    };
+
+    function showToast(msg, type) {
+      type = type || 'success';
+      const icon = toastIcons[type];
+      $('#toastMsg').text(msg);
+      $('#toastIcon')
+        .attr('class', 'fas ' + icon.cls)
+        .css('color', icon.color);
+      const el = document.getElementById('liveToast');
+      bootstrap.Toast.getOrCreateInstance(el).show();
+    }
+
+
+    /* ══════════════════════════════════════
+       FORM SUBMITS
+    ══════════════════════════════════════ */
+    function validateForm($form) {
+      let allValid = true;
+      $form.find('.field-control').each(function () {
+        if (!validateField($(this))) allValid = false;
+      });
+      return allValid;
+    }
+
+    // Login
+    $('#loginForm').on('submit', function (e) {
+      e.preventDefault();
+      if (validateForm($(this))) {
+        showToast('Giriş başarılı! Yönlendiriliyorsunuz…', 'success');
+      } else {
+        showToast('Lütfen hataları düzeltin.', 'error');
+      }
+    });
+
+    // Register
+    $('#registerForm').on('submit', function (e) {
+      e.preventDefault();
+      if (validateForm($(this))) {
+        showToast('Hesabınız oluşturuldu! Giriş yapabilirsiniz.', 'success');
+        setTimeout(function () { switchTab('login'); }, 1800);
+      } else {
+        showToast('Lütfen hataları düzeltin.', 'error');
+      }
+    });
+
+    // Forgot
+    $('#forgotForm').on('submit', function (e) {
+      e.preventDefault();
+      if (validateForm($(this))) {
+        showToast('Sıfırlama bağlantısı e-postanıza gönderildi.', 'info');
+      } else {
+        showToast('Lütfen geçerli bir e-posta adresi girin.', 'error');
+      }
+    });
+
+  }); // end $(function)
+  </script>
 </body>
 </html>
